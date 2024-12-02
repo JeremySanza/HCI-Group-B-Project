@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import csv
+import Display_Visual_Page
 
 def load_courses(file_path):
     courses = set()
@@ -24,27 +25,22 @@ def load_students(file_path):
         print(f"Error: File '{file_path}' not found.")
     return sorted(student_ids)
 
-def update_selected_courses_and_students():
+def open_visualisation_page():
     selected_courses = [course for course, var in course_vars.items() if var.get()]
     selected_student = selected_student_id.get()
     selected_date = selected_date_entry.get()
-    print("Selected Courses for Comparison:", selected_courses)
-    print("Selected Student ID for Comparison:", selected_student)
-    print("Selected Date for Filtering:", selected_date)
 
-def apply_filter_and_compare():
-    selected_courses = [course for course, var in course_vars.items() if var.get()]
-    selected_student = selected_student_id.get()
-    selected_date = selected_date_entry.get()
-    print("Applying Filter and Comparison with the following options:")
+    print("Redirecting to visualisation page with:")
     print("Selected Courses:", selected_courses)
     print("Selected Student ID:", selected_student)
     print("Selected Date:", selected_date)
 
+    root.withdraw()
+    Display_Visual_Page.create_visual_page(root, selected_courses, selected_student, selected_date)
+
 root = tk.Tk()
 root.title("Filter and Compare")
 root.geometry("800x600")
-
 root.configure(bg="#f0f0f0")
 
 heading = tk.Label(root, text="Filter and Compare", font=("Helvetica", 24, "bold"), pady=20, bg="#f0f0f0")
@@ -96,10 +92,7 @@ for course in course_list:
     checkbox.pack(anchor="w", pady=2)
     course_vars[course] = var
 
-compare_button = tk.Button(right_frame, text="Compare Selected Courses", command=update_selected_courses_and_students, font=("Helvetica", 12, "bold"), bg="#4CAF50", fg="white", relief="raised")
-compare_button.pack(pady=10, padx=10)
-
-apply_filter_button = tk.Button(right_frame, text="Apply Filter and Compare options", command=apply_filter_and_compare, font=("Helvetica", 12, "bold"), bg="#2196F3", fg="white", relief="raised")
-apply_filter_button.pack(pady=10, padx=10)
+visualise_button = tk.Button(right_frame, text="Visualise Filter and Compare", command=open_visualisation_page, font=("Helvetica", 12, "bold"), bg="#4CAF50", fg="white", relief="raised")
+visualise_button.pack(pady=10, padx=10)
 
 root.mainloop()
