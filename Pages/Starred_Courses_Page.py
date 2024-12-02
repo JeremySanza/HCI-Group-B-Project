@@ -1,21 +1,21 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, Listbox
+from tkinter import messagebox
 import csv
-
 
 
 def read_csv():
     courses = []
-    with open('Data/courses.csv',mode='r') as file:
+    with open('Data/courses.csv', mode='r') as file:
         reader = csv.DictReader(file)
         for row in reader:
             courses.append({
                 "module": row["code_module"],
                 "presentation": row["code_presentation"],
                 "length": row["module_presentation_length"],
-                "starred": False  # Default star status is False (unstarred)
+                "starred": row.get("starred", "No").strip().lower() == "yes" 
             })
     return courses
+
 
 def write_csv(courses):
     with open('Data/courses.csv', mode='w', newline='') as file:
@@ -28,25 +28,27 @@ def write_csv(courses):
                 'code_module': course['module'],
                 'code_presentation': course['presentation'],
                 'module_presentation_length': course['length'],
-                'Starred': 'Yes' if course['starred'] else 'No'
+                'starred': 'Yes' if course['starred'] else 'No'
             })
 
 
 def star_course(course_name, courses):
     for course in courses:
-        fcourse_name = f"{course['module']} {course['presentation']}"
-        if fcourse_name == course_name:
+        full_course_name = f"{course['module']} {course['presentation']}"
+        if full_course_name == course_name:
             course['starred'] = not course['starred']
-            update_favs(courses)
+            update_courses(courses) 
             write_csv(courses)
             return
 
-def update_favs(courses):
-    listbox.delete(0, tk.END)
+
+def update_courses(courses):
+    listbox.delete(0, tk.END)  
     for course in courses:
-        fcourse_name = f"{course['module']} {course['presentation']}"
+        full_course_name = f"{course['module']} {course['presentation']}"
         star = "★" if course['starred'] else "☆"
-        listbox.insert(tk.END, f"{star} {fcourse_name} ({course['length']} mins)")
+        listbox.insert(tk.END, f"{star} {full_course_name} ({course['length']} mins)")
+
 
 def course_selected(event, courses):
     selected_index = listbox.curselection()
@@ -55,36 +57,37 @@ def course_selected(event, courses):
         messagebox.showinfo("Course Analytics", f"Displaying analytics for {selected_course}.")
 
 
+def handle_toggle(courses):
+    selected_index = listbox.curselection()
+    if selected_index:
+        selected_course = listbox.get(selected_index).strip("★☆ ").split(" (")[0]
+        star_course(selected_course, courses)
+    else:
+        messagebox.showwarning("No Selection", "Please select a course to toggle its star status.")
 
 def starred_courses_page():
-    courses = read_csv()  # Read courses from the CSV
+    courses = read_csv()
 
-    # Create the main window
+  
     page = tk.Tk()
     page.title("Starred Courses Page")
     page.geometry("600x600")
 
-    # Title Label
+
     title_label = tk.Label(page, text="Starred Courses Page", font=("Arial", 20))
     title_label.pack(pady=20)
 
-    # listbox to display courses with star icons
-    global listbox
+    global listbox  
     listbox = tk.Listbox(page, width=40, height=15, selectmode=tk.SINGLE, font=("Arial", 12))
     listbox.pack(pady=10)
 
-    # Bind double-click to open course analytics
     listbox.bind("<Double-1>", lambda event: course_selected(event, courses))
 
-    # Button to toggle the starred status of the selected course
-    toggle_button = tk.Button(page, text="Star Course", command=lambda: star_course(listbox.get(tk.ACTIVE).strip("★☆ "), courses))
+    toggle_button = tk.Button(page, text="Star Course", command=lambda: handle_toggle(courses))
     toggle_button.pack(pady=10)
 
-    # Update the displayed starred courses
-    update_favs(courses)
+    update_courses(courses)
 
-    # Run the application
     page.mainloop()
-
 
 starred_courses_page()
