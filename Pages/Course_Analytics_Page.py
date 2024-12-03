@@ -33,7 +33,6 @@ def course_analytics_page():
         unRegistration = {"AAA": 0, "BBB": 0, "CCC": 0, "DDD": 0, "EEE": 0, "FFF": 0, "GGG": 0}
         count = 0
 
-        row = 1
         for row in csvFile:
             count += 1
             registration[row[courseColumn]] += 1
