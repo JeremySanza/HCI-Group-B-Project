@@ -17,6 +17,44 @@ def courseBarChart(registration, unRegistration):
     mp.show()
 
 
+def read_csv():
+    x_data = []
+    y_data = []
+
+    with open('Data/red_studentVLE.csv', mode='r') as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            try:
+                day_num = row['date']
+                x_data.append(day_num)
+
+                sum_click = float(row['sum_click'])
+                y_data.append(sum_click)
+            except KeyError as e:
+                print(f"Missing column: {e}")
+            except ValueError as e:
+                print(f"Error parsing data: {e}")
+
+    return x_data, y_data
+
+
+def diseng_plot(x_data, y_data):
+    mp.scatter(x_data, y_data, color='blue', marker='o')  # Scatter plot
+    mp.xlabel('Date')
+    mp.ylabel('Sum of Clicks')
+    mp.title('Disengagement Metric')
+    mp.xticks(rotation=45)
+    mp.grid(True)
+    mp.tight_layout()
+    mp.show()
+
+
+# Function to handle button click in Tkinter
+def on_button_click():
+    x_data, y_data = read_csv()
+    diseng_plot(x_data, y_data)
+
+
 def course_analytics_page():
     page = tk.Tk()
     page.title("Course Analytics Page")
@@ -49,9 +87,74 @@ def course_analytics_page():
         button = tk.Button(page, text="View Course Disengagement", command=lambda: courseBarChart(registration, unRegistration))
         button.pack(pady=10)
 
+        d_button = tk.Button(page, text="Alternative Disengagement Metric", command=on_button_click)
+        d_button.pack(pady=10)
+
         exit = tk.Button(page, text="Close", command=page.destroy)
         exit.pack(pady=20)
 
     page.mainloop()
 
 course_analytics_page()
+
+#
+# ###################################
+#
+# import tkinter as tk
+# import csv
+# import matplotlib.pyplot as mp
+# # from datetime import datetime
+#
+#
+# def read_csv(file_name):
+#     x_data = []
+#     y_data = []
+#
+#     with open('Data/red_studentVLE.csv', mode='r') as file:
+#         reader = csv.DictReader(file)
+#         for row in reader:
+#             try:
+#                 day_num = row['date']
+#                 x_data.append(day_num)
+#
+#                 sum_click = float(row['sum_click'])
+#                 y_data.append(sum_click)
+#             except KeyError as e:
+#                 print(f"Missing column: {e}")
+#             except ValueError as e:
+#                 print(f"Error parsing data: {e}")
+#
+#     return x_data, y_data
+#
+#
+# def diseng_plot(x_data, y_data):
+#     mp.scatter(x_data, y_data, color='blue', marker='o')  # Scatter plot
+#     mp.xlabel('Date')
+#     mp.ylabel('Sum of Clicks')
+#     mp.title('Disengagement Metric')
+#     mp.xticks(rotation=45)
+#     mp.grid(True)
+#     mp.tight_layout()
+#     mp.show()
+#
+#
+# # Function to handle button click in Tkinter
+# def on_button_click():
+#     file_name = 'Data/red_studentVLE.csv'  # Static file path
+#     x_data, y_data = read_csv(file_name)
+#     diseng_plot(x_data, y_data)
+#
+# #
+# #
+# # # Create a label and entry widget to take the CSV file path as input
+# # label = tk.Label(root, text="This will use 'Data/red_studentVLE.csv'.")
+# # label.pack()
+# #
+# # # Create a button that triggers the plot when clicked
+# #
+# #
+# # # Start the Tkinter main loop
+# # root.mainloop()
+# #
+#
+#
